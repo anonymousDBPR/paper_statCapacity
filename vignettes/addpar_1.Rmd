@@ -1,0 +1,20 @@
+---
+title: "Additional parameters: Main wrapper function"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Additional parameters of capacity_logreg_main
+
+Apart from crucial parameters for the algorithm estimation, the main wrapper function `capacity_logreg_main` has also other parameters than can be used to tune the functioning of the package. These are
+
+* `model_out` (default=TRUE) - specify if nnet model object should saved into output file
+* `graphs` (default=TRUE) - controls creating diagnostic plots in the output directory.
+* `plot_width` (default = 6) - the width of the created plots 
+* `plot_height` (default = 4) - the height of the created plots
+* `scale` (default = TRUE) - logical value indicating if the response columns of `dataRaw` are to be scaled, what is recommended. This choice should be approached similarly as in PCA decomposition for instance.
+
+
+In the future, here will be an example how the scaling could change the result.
+

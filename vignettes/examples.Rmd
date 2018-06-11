@@ -1,0 +1,112 @@
+---
+title: "Basic examples"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document shows simple examples of the use of our package to estimate channel capacity for experimental data.
+
+## Basic experimental design
+
+The framework of information theory allows for example to interpret the effectviness of a given system to transmit information between an input (e.g. stimulus, cytokine) and output (e.g. expression of transcription factor) by using channel capacity. This requires that the conditional distribution of output given input is described by sufficiently large dataset. The natural way to organise such data within R is to use data.frame (or data.table for larger datasets) with two types of columns: 
+
+1. signal (input; single column  of type factor); 
+2. response (output; possible many columns of type numeric), where each row represents one observation from the experiment.
+
+```{r, include=FALSE}
+library(CapacityLogReg)
+tempdata=data_example1[,c("signal","response")]
+```
+
+```{r, results="asis",echo=FALSE}
+knitr::kable(head(tempdata))
+```
+
+where column signal has finite (and relatively low) number of levels. 
+
+## The structure of package
+
+The package is based on main wrapper function - `capacity_logreg_main`, which calls further methods. The use of this function is strongly suggested. The raw algorithm is implemented within `capacity_logreg_alogrithm` and is based on function `multinom` from `nnet` package to estimate logistic regression. Additional function of the package include graphing functions (`output_graphs`,`theme_publ`), testing procedures (`capacity_logreg_testing`,`sampling functions`) and some auxilliaries (`x_log_y`,`trapz_simple`,`jointProb_gaussian_md`,``formula_generator`,`deleteNA_df`).
+
+## Calculating channel capacity - example #1
+
+For the basic example we will use data available in `data_example1` object that is added to the package. It includes a simple data.frame with three columns: 
+
+* `signal` - factor class with 3 levels (500 observations each); 
+* `response` - numeric class; 
+* `sideVar` - factor class with 3 levels (various number of observations). 
+
+We can calculate capacity of a channel $X->Y$, where $X=signal$, $Y=response$ using function `capacity_logreg_main` by supplying: 
+
+* the data.frame of experimental data, 
+* the name of the column  to be treated as the signal, 
+* the name of the column(s) to be treated as the responss 
+* the directory to which the diagnostic plots are to be plotted
+
+```c
+library(CapacityLogReg)
+
+dir.create("example1/")
+outputCLR=capacity_logreg_main(dataRaw=data_example1,
+                            signal="signal",response="response",
+                            output_path="example1/")
+```
+
+```{r,include=FALSE,cache=TRUE}
+library(CapacityLogReg)
+
+dir.create("example1/")
+outputCLR=capacity_logreg_main(dataRaw=data_example1,
+                            signal="signal",response="response",
+                            output_path="example1/")
+```
+
+The resulting capacity is saved under `outputCLR$cc`, whereas the channel beahviour is summarised by several plots combined in `MainPlot.pdf` under given directory or `outputCLR$logGraps[[1]]`.
+
+```{r}
+outputCLR$cc
+```
+
+```{r fig.cap="Output graphs from capacity_logreg_main applied to data stored in data_example1. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value.",fig.align="center",echo=FALSE,message=FALSE, fig.height=12,fig.width=8}
+library(grid)
+library(gridExtra)
+grid.arrange(outputCLR$logGraphs[[1]])
+```
+
+All output is saved in file `output.rds`.
+
+## Calculating channel capacity - example #2
+
+The main advantage of following implementation is its feasibility in applying to multidimensional cases as in data provided in object `data_example2`, where the response is given by three variables.
+
+```{r, results="asis",echo=FALSE}
+knitr::kable(head(data_example2))
+```
+
+We can easily calculate capacity in this case by using
+
+```c
+library(CapacityLogReg)
+
+dir.create("example2/")
+outputCLR=capacity_logreg_main(dataRaw=data_example2,
+                            signal="signal",response=c("X1","X2","X3"),
+                            output_path="example2/")
+```
+
+```{r,include=FALSE,cache=TRUE}
+dir.create("example2/")
+outputCLR2=capacity_logreg_main(dataRaw=data_example2,
+                            signal="signal",response=c("X1","X2","X3"),
+                            output_path="example2/")
+```
+
+which returns
+
+```{r fig.cap="Output graphs from capacity_logreg_main applied to data stored in data_example2. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value.", fig.align="center", echo=FALSE, message=FALSE, fig.height=12, fig.width=8}
+grid.arrange(outputCLR2$logGraphs[[1]])
+```
+
+
+

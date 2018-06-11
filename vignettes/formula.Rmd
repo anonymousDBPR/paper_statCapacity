@@ -1,0 +1,91 @@
+---
+title: "Extensions: Formula of logistic regression model"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Using extened logistic regression formula
+
+Our method for channel capacity estimation is based on classification performance of basic logistic regression model. However, sometimes it can be a poor way to descrive the patterns in the data. Still, adjustment are usually easy to implement to achieve a better classificator and a better estimate to channel capacity as a result.
+
+The most straightforward method to correct the algorithm performance is tuning the formula of model variables. It can be achieved by directly specifying argument `formula_string` of `capacity_logreg_main` function.
+
+```{r,include=FALSE}
+library(CapacityLogReg)
+library(ggplot2)
+
+n=500
+m1=10
+m2=10.5
+s1=1
+s2=2
+
+xx=seq(from=0,to=20,length.out = 1000)
+
+plot=ggplot(data=data.frame(x=c(xx,xx),
+              y=c(dnorm(xx,mean=m1,sd=s1),
+                  dnorm(xx,mean=m2,sd=s2)),
+              type=c(rep("X1",length(xx)),rep("X2",length(xx)))),aes(x=x,y=y,fill=type))+
+  geom_area(position = "dodge",alpha=0.6)+geom_line(size=2,aes(group=type))+
+  theme_publ(version=2)+scale_y_continuous("density")+scale_x_continuous("Y")
+
+```
+
+Let's consider a simple example of channel $X\to Y$, where $X$ is a two-state variable, $X=1$ or $X=2$ and conditional distributions of $Y|X$ are Gaussians:
+$$ Y|X_1\sim \mathcal{N}(10,1^2),\quad Y|X_2\sim \mathcal{N}(10.5,2^2)$$
+In brief, means of $Y|X$ differs slightly, whereas variances differs much. Below theoretical graphs of density plots of these two distributions are presented.
+
+```{r fig.cap="Graphs of density plots of Y|X distributions", fig.align="center", echo=FALSE, message=FALSE, fig.height=4, fig.width=6,warning=FALSE}
+plot
+```
+
+We present the outcome of two algorithms. Firstly, `standard` algorithm with simple formula
+$$ X \sim Y $$
+inserted into logistic regression algorithm by calling 
+`capacity_logreg_main(dataRaw=data,signal="x",response = "y",output_path =path )`.
+Secondly, algorithm `with log terms` with formula
+$$ X \sim Y +\log(Y)$$
+inserted into logistic regression algorithm by calling 
+`capacity_logreg_main(dataRaw=data,signal="x",response = "y",output_path =path,formula_string="x~y+I(log(y))")`. We sampled 500 observations for each of $X$ level and used our algorithms in those two settings. Then, whole procedure is repeated 50 times. Analytically computed channel capacity (by brute force optimisation and numerical evaluation of integrals) is calculated for benchmark.
+
+```{r,include=FALSE,cache=TRUE}
+outputLRcc<-c()
+outputLR_formulacc<-c()
+
+nboot=50
+outputEx<-cc_exact(type="gauss",classes=2,dimension=1,list(mu1=m1,mu2=m2,sd1=s1,sd2=s2),10000,1000)
+
+for (i in 1:nboot){
+data=data.frame(x=c(rep("A",n),rep("B",n)),
+                y=c(rnorm(n,mean=m1,sd=s1),rnorm(n,mean=m2,sd=s2)))
+ggplot(data=data,aes(x=y,colour=x,y=..density..))+geom_density()
+
+path="example_formula/"
+outputLR<-capacity_logreg_main(dataRaw=data,signal="x",response = "y",output_path =path )
+
+outputLR_formula<-capacity_logreg_main(dataRaw=data,signal="x",response = "y",output_path =path,
+                                       formula_string="x~y+I(log(y))")
+
+outputLRcc[i]<-outputLR$cc
+outputLR_formulacc[i]<-outputLR_formula$cc
+
+}
+
+
+dataResults=data.frame(capacity=c(outputLRcc,outputLR_formulacc),
+                       type=c(rep("standard",nboot),rep("with log term",nboot)))
+
+plot=ggplot(data=dataResults,aes(y=capacity,x=type,group=type))+geom_boxplot()+
+  geom_abline(slope=0,intercept=outputEx$cc,size=1.5,color="blue")+theme_publ(version=2)+
+  scale_y_continuous("Capacity (bits)",limits=c(0,0.2))+scale_x_discrete("Formula type")
+```
+
+
+Here is the plot that compares both apporaches
+
+```{r fig.cap="Channel capacity calculated using two different formulas of logistic regression. Boxplots based on 50 repetition of algorithm. Blue line is true channel capacity.", fig.align="center", echo=FALSE, message=FALSE, fig.height=4, fig.width=6,warning=FALSE}
+plot
+```
+
+

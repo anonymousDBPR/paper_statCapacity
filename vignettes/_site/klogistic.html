@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Extensions: Kernel logistic regression</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #dddddd; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { font-weight: bold; } /* Keyword */
+code > span.dt { color: #800000; } /* DataType */
+code > span.dv { color: #0000ff; } /* DecVal */
+code > span.bn { color: #0000ff; } /* BaseN */
+code > span.fl { color: #800080; } /* Float */
+code > span.ch { color: #ff00ff; } /* Char */
+code > span.st { color: #dd0000; } /* String */
+code > span.co { color: #808080; font-style: italic; } /* Comment */
+code > span.al { color: #00ff00; font-weight: bold; } /* Alert */
+code > span.fu { color: #000080; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #ff0000; font-weight: bold; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #ff00ff; } /* SpecialChar */
+code > span.vs { color: #dd0000; } /* VerbatimString */
+code > span.ss { color: #dd0000; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { } /* ControlFlow */
+code > span.op { } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { font-weight: bold; } /* Preprocessor */
+code > span.at { } /* Attribute */
+code > span.do { color: #808080; font-style: italic; } /* Documentation */
+code > span.an { color: #808080; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #808080; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #808080; font-weight: bold; font-style: italic; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">LogRegCapacity</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Introduction</a>
+</li>
+<li>
+  <a href="examples.html">Basic Examples</a>
+</li>
+<li>
+  <a href="testing.html">Testing procedures</a>
+</li>
+<li>
+  <a href="conditional.html">Conditional channel capacity</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Extensions
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="formula.html">Formula of logistic regression model</a>
+    </li>
+    <li>
+      <a href="klogistic.html">Kernel logistic regression</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Additional parameters
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="addpar_1.html">Main wrapper function</a>
+    </li>
+    <li>
+      <a href="addpar_2.html">Parameters of nnet package</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Extensions: Kernel logistic regression</h1>
+
+</div>
+
+
+<div id="using-kernel-logistic-regression" class="section level2">
+<h2>Using kernel logistic regression</h2>
+<p>Our method for channel capacity estimation is based on classification performance of basic logistic regression model. However, sometimes it can be a poor way to descrive the patterns in the data. Still, adjustment are usually easy to implement to achieve a better classificator and a better estimate to channel capacity as a result.</p>
+<p>The most comprehensive way to deal with complicated data structure is to use Kernel approach with a proper feature selection method. To ease the integration of such procedure within our method, we also allow to use <code>glmnet</code> implementation of logistic regression from <code>glmnet</code> package. It is possible by setting in main wrapper function <code>capacity_logreg_main</code> arguments:</p>
+<ul>
+<li><code>glmnet_algorithm</code> (default=FALSE) - a logical value indicating if glmnet package should be used</li>
+<li><code>dataMatrix</code> (default = NULL) - data to be used as a response (the same as needed in glmnet function)</li>
+<li><code>glmnet_cores</code> (default = 1) - number of cores to use in cross-validation of glmnet</li>
+<li><code>glmnet_lambdanum</code> (default = 10) - parameter of glmnet algorithm</li>
+</ul>
+<p>In general, in the case it was needed, we propose to use <code>KernSmooth</code> or <code>kernlab</code> package to generate a proper kernel extension of data and then include it into our algorithm as described above via glmnet dataMatrix object.</p>
+<p>Below is an example of combining our package, kernel methods and glmnet algorithm. Channel is defined in the same way as in the example in <a href="https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/lr_formulas.Rmd"><code>formula.html</code></a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(CapacityLogReg)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(KernSmooth)
+<span class="kw">library</span>(kernlab)
+
+n=<span class="dv">500</span>
+m1=<span class="dv">10</span>
+m2=<span class="fl">10.5</span>
+s1=<span class="dv">1</span>
+s2=<span class="dv">2</span>
+
+<span class="kw">setwd</span>(<span class="st">&quot;H:</span><span class="ch">\\</span><span class="st">R</span><span class="ch">\\</span><span class="st">CreatePackage</span><span class="ch">\\</span><span class="st">CapacityLogReg</span><span class="ch">\\</span><span class="st">vignettes&quot;</span>)
+
+outputLRcc&lt;-<span class="kw">c</span>()
+outputLR_formulacc&lt;-<span class="kw">c</span>()
+
+outputEx&lt;-<span class="kw">cc_exact</span>(<span class="dt">type=</span><span class="st">&quot;gauss&quot;</span>,<span class="dt">classes=</span><span class="dv">2</span>,<span class="dt">dimension=</span><span class="dv">1</span>,<span class="kw">list</span>(<span class="dt">mu1=</span>m1,<span class="dt">mu2=</span>m2,<span class="dt">sd1=</span>s1,<span class="dt">sd2=</span>s2),<span class="dv">10000</span>,<span class="dv">1000</span>)
+
+
+df=<span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;A&quot;</span>,n),<span class="kw">rep</span>(<span class="st">&quot;B&quot;</span>,n)),
+                  <span class="dt">y=</span><span class="kw">c</span>(<span class="kw">rnorm</span>(n,<span class="dt">mean=</span>m1,<span class="dt">sd=</span>s1),<span class="kw">rnorm</span>(n,<span class="dt">mean=</span>m2,<span class="dt">sd=</span>s2)))
+
+yklr=<span class="kw">as.matrix</span>(df$y)
+xklr=<span class="kw">as.matrix</span>(df$x)
+rbf&lt;-<span class="kw">rbfdot</span>(<span class="dt">sigma=</span><span class="fl">1.4</span>)
+kMatrix&lt;-<span class="kw">kernelMatrix</span>(rbf,yklr)
+
+path=<span class="st">&quot;example_kformula/&quot;</span>
+<span class="kw">dir.create</span>(path,<span class="dt">recursive =</span> <span class="ot">TRUE</span>)
+capacity=<span class="kw">capacity_logreg_main</span>(<span class="dt">dataRaw=</span>df, <span class="dt">signal=</span><span class="st">&quot;x&quot;</span>, <span class="dt">response=</span><span class="st">&quot;y&quot;</span>,<span class="dt">side_variables=</span><span class="ot">NULL</span>,
+                                        <span class="dt">formula_string=</span><span class="ot">NULL</span>,
+                                        <span class="dt">glmnet_algorithm=</span><span class="ot">TRUE</span>,<span class="dt">dataMatrix=</span>kMatrix, 
+                                        <span class="dt">glmnet_cores=</span><span class="dv">1</span>,<span class="dt">glmnet_lambdanum=</span><span class="dv">10</span>,
+                                        <span class="dt">cc_maxit=</span><span class="dv">100</span>,<span class="dt">lr_maxit=</span><span class="dv">1000</span>, <span class="dt">MaxNWts =</span> <span class="dv">5000</span>, 
+                                        <span class="dt">output_path=</span>path,
+                                        <span class="dt">testing=</span><span class="ot">FALSE</span>,<span class="dt">graphs=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="klogistic_files/figure-html/unnamed-chunk-1-1.png" width="576" /><img src="klogistic_files/figure-html/unnamed-chunk-1-2.png" width="576" /></p>
+</div>
+
+<p>See package on <a href="https://github.com/TJetka/LogRegCapacity">GitHub</a>. In case of any problems, please contact the authors for further instructions: t.jetka at gmail.com.</p>
+<p>Copyright &copy; 2018 Tomasz Jetka.</p>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

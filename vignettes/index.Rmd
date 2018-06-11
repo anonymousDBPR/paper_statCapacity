@@ -1,0 +1,108 @@
+---
+title: "Introduction"
+---
+
+# Using CapacityLogReg package to estimate channel capacity
+
+CapacityLogReg estimates channel capacity between finite state input and multidimensional output experimental data.
+
+## Setup
+
+### Requirements
+
+CapacityLogReg is implemented solely in R and uses following packages:
+
+1. for estimation
+
+  + nnet
+  + glmnet
+  + mvtnorm
+  + caret
+  + doParallel
+  
+2. for visualisation
+
+  + ggplot2
+  + ggthemes
+  + gridExtra
+  
+3. data handling
+
+  + data.table
+  + reshape2
+  + stringr
+  + plyr
+
+### Installation
+
+Until it is accepted on CRAN, in order to install the package use command:
+
+> `install_github("TJetka/LogRegCapacity",auth_token="9f47a3507be358a8782fa8262a01c0413d60cc80")`
+
+All dependencies should be installed simulatenously with the package. If you wish to install them independently, you need: 
+
+> `ggplot2, ggthemes, gridExtra, nnet, reshape2, stringr, glmnet, data.table,doParallel, mvtnorm, caret, plyr`
+
+## Basic usage
+
+The package is based on a main wrapper function - `capacity_logreg_main`, which calls further functions and the use of this function is strongly suggested.
+
+### Input data
+
+For the calculation of channel capacity between X and Y you need
+
+* Data frame `dataRaw` with `signal` column of factor type (X) and `response` columns of numeric type (Y)
+where `signal` has finite number of unique values.
+
+### Run
+
+In order to estimate channel capacity, using basic logistic regression model, run
+
+> `capacity_logreg_main(dataRaw, signal, response, output_path)`
+
+where: 
+
+* `dataRaw` is experimental data
+* `signal` is a character which indicates the name of column in `dataRaw` representing the signal (X) variable
+* `response` is a character vector which indicates the names of columns in `dataRaw` representing the response (Y) variables
+* `output_path` is a character with the directory, to which output should be saved
+
+### Output values
+
+A result of `capacity_logreg_main` is a list, whose main elements are
+
+* cc - channel capacity estimate (in bits)
+* p_opt - distribution of optimal signal distribution
+* model - `nnet` object describing estimated model
+
+This output object is saved in `output_path` directory in rds format.
+
+### Visualization
+
+If `graphs` argument of `capacity_logreg_main` is set to TRUE (as in default), also additional exploratory graphs are drawn and saved in pdf format in `output_path` directory.
+
+## Other functionalities
+
+Within the package various types, approaches and diagnostics of estimation of channel capacity is implemented
+
+* Bootstrap tests of significance - see [`vignettes/testing.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/testing.Rmd)
+* Conditional channel capacity - see [`vignettes/conditional.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/conditional.Rmd)
+* Use of different formula of logisitc regression model - see [`vignettes/formula.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/formula.Rmd)
+* Glmnet algorithm, which allows for direct use of Kernel Logistic Regression - see [`vignettes/klogistic.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/klogistic.Rmd)
+* Parameters of nnet algorithm - see [`vignettes/addpar_1.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/add_par1.Rmd)
+* Additional parameters - see [`vignettes/addpar2.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/addpar_2.Rmd)
+
+## Examples
+
+Additional examples of using package with some background on information theory is given in [`vignettes/examples.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/examples.Rmd). Codes used in publication are given in [`vignettes/examples_paper.Rmd`](https://github.com/TJetka/LogRegCapacity/blob/master/vignettes/examples_paper.Rmd).
+
+## Support
+
+Please mail t.jetka at gmail.com in case of any bugs, problems and questions regarding package or inquiries regarding information theory.
+
+## Reference
+
+Please cite
+
+> Jetka et al., Estimator of channel capacity using statistical learning, 2018 (to be published)
+

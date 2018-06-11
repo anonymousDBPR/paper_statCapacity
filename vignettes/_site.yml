@@ -1,0 +1,30 @@
+name: "LogRegCapacity"
+navbar:
+  title: "LogRegCapacity"
+  left:
+    - text: "Introduction"
+      href: index.html
+    - text: "Basic Examples"
+      href: examples.html
+    - text: "Testing procedures"
+      href: testing.html
+    - text: "Conditional channel capacity"
+      href: conditional.html
+    - text: "Extensions"
+      menu:
+        - text: "Formula of logistic regression model"
+          href: formula.html
+        - text: "Kernel logistic regression" 
+          href: klogistic.html
+    - text: "Additional parameters"
+      menu:
+        - text: "Main wrapper function"
+          href: addpar_1.html
+        - text: "Parameters of nnet package"
+          href: addpar_2.html
+output:
+  html_document:
+    theme: journal
+    highlight: kate
+    include:
+      after_body: footer.html

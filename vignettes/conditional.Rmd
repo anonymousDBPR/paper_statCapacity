@@ -1,0 +1,229 @@
+---
+title: "Conditional channel capacity"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Estimating conditional channel capacity
+
+```{r, include=FALSE}
+library(CapacityLogReg)
+library(ggplot2)
+library(gridExtra)
+```
+
+
+```{r, include=FALSE,cache=TRUE}
+library(CapacityLogReg)
+library(ggplot2)
+library(gridExtra)
+## Example 2  - paper ####
+signal=c("0","0.1","1","10")
+
+boot_cores=6
+testing_cores=6
+nboot=18
+
+means=list()
+sds=list()
+means[["0"]]=   c(1, 2  ,  3 )
+means[["0.1"]]= c(2, 4  ,  6 )
+means[["1"]]=   c(3, 6  , 9   )
+means[["10"]]=  c(4, 8  , 12   )
+
+sds[["0"]]   = c(1   , 1 ,1)
+sds[["0.1"]] = c(1 , 1   ,1  )
+sds[["1"]]   = c(1 ,1 ,1)
+sds[["10"]]  = c(1 , 1 ,1  )
+
+N=c(10000,10000,10000,10000)
+names(N)<-signal
+
+sideTypes=c("type 1","type 2","type 3")
+probs=c(0.6,0.3,0.1)
+path_2=paste('example_conditional/p_',paste(as.character(round(probs,2)),collapse="_"),'/',format(Sys.time(),"%Y%m%d_%H%M"),"/",sep="")
+dir.create(path_2,recursive=TRUE)
+
+dataList=lapply(signal,function(x){
+  components<-sample(1:3,prob=probs,size=N[x],replace=TRUE)
+  sideVarSample <- sideTypes[components]
+  ResponseSample <- rnorm(n=N[x],mean=means[[x]][components],sd=sds[[x]][components])
+  data.frame(sideVar=sideVarSample,response=ResponseSample,signal=x)
+})
+
+data=do.call(rbind,dataList)
+colnames(data)<-c("sideVar","response","signal")
+
+path_2_raw=paste(path_2,"raw/",sep="")
+dir.create(path_2_raw)
+
+data$signal<-as.numeric(as.character(data$signal))
+dataRaw  <- capacity_logreg_main(dataRaw=data,
+                                    signal="signal", response="response", side_variables = "sideVar" ,
+                                    cc_maxit=150,lr_maxit=1500,output_path=path_2_raw,plot_height=8,plot_width=12,
+                                    testing=TRUE,graphs=TRUE,scale=TRUE,
+                                    TestingSeed=1234,
+                                    boot_num=nboot,boot_prob=0.8,testing_cores=testing_cores,
+                                    sidevar_num=nboot,
+                                    traintest_num=nboot,partition_trainfrac=0.6)
+
+
+path_2_sideE=paste(path_2,"sideVar/",sep="")
+dir.create(path_2_sideE)
+dataSV  <- capacity_logreg_main(dataRaw=data,
+                                      signal="signal", response="response", side_variables = "sideVar" ,
+                                      formula_string = "signal~response*sideVar",
+                                      cc_maxit=150,lr_maxit=1500, output_path=path_2_sideE,plot_height=8,plot_width=12,
+                                      testing=TRUE,graphs=TRUE,
+                                      TestingSeed=1234,
+                                      boot_num=nboot,boot_prob=0.8,testing_cores=boot_cores,
+                                      sidevar_num=nboot,
+                                      traintest_num=nboot,partition_trainfrac=0.6)
+
+
+path_2_side=paste(path_2,"sideVar/type1/",sep="")
+dir.create(path_2_side)
+dataSV1  <- capacity_logreg_main(dataRaw=data[data$sideVar=="type 1",],
+                                signal="signal", response="response", side_variables = "sideVar" ,
+                                formula_string = "signal~response +sideVar:response",
+                                cc_maxit=150,lr_maxit=1500, output_path=path_2_side,plot_height=8,plot_width=12,
+                                testing=TRUE,graphs=TRUE,
+                                TestingSeed=1234,
+                                boot_num=nboot,boot_prob=0.8,testing_cores=boot_cores,
+                                sidevar_num=nboot,
+                                traintest_num=nboot,partition_trainfrac=0.6)
+
+path_2_side=paste(path_2,"sideVar/type2/",sep="")
+dir.create(path_2_side)
+dataSV2  <- capacity_logreg_main(dataRaw=data[data$sideVar=="type 2",],
+                                signal="signal", response="response", side_variables = "sideVar" ,
+                                formula_string = "signal~response +sideVar:response",
+                                cc_maxit=150,lr_maxit=1500, output_path=path_2_side,plot_height=8,plot_width=12,
+                                testing=TRUE,graphs=TRUE,
+                                TestingSeed=1234,
+                                boot_num=nboot,boot_prob=0.8,testing_cores=boot_cores,
+                                sidevar_num=nboot,
+                                traintest_num=nboot,partition_trainfrac=0.6)
+
+path_2_side=paste(path_2,"sideVar/type3/",sep="")
+dir.create(path_2_side)
+dataSV3  <- capacity_logreg_main(dataRaw=data[data$sideVar=="type 3",],
+                                signal="signal", response="response", side_variables = "sideVar" ,
+                                formula_string = "signal~response +sideVar:response",
+                                cc_maxit=150,lr_maxit=1500, output_path=path_2_side,plot_height=8,plot_width=12,
+                                testing=TRUE,graphs=TRUE,
+                                TestingSeed=1234,
+                                boot_num=nboot,boot_prob=0.8,testing_cores=boot_cores,
+                                sidevar_num=nboot,
+                                traintest_num=nboot,partition_trainfrac=0.6)
+
+plotB1=ggplot(data=data, aes(x=signal,y=response,fill=signal,group=signal))+geom_boxplot()
+plotB2=ggplot(data=data, aes(x=signal,y=response,fill=signal,group=signal))+geom_boxplot()+
+  facet_grid(sideVar~.,scale="free_y")
+
+
+plot1=ggplot(data=dataRaw$data,aes(x=signal,y=response,fill=signal))+geom_boxplot()+
+  ggtitle(paste("Capacity -","sideVar",sep=" " ) )+
+  scale_fill_brewer(palette = "Set1",type="qual")+
+  theme_publ(version=2)
+
+plot2=ggplot(data=dataSV$data,aes(x=signal,y=response,fill=signal))+geom_boxplot()+
+  facet_grid(sideVar~.,scale="free_y")+
+  ggtitle(paste("Capacity -","sideVar",sep=" " ) )+
+  scale_fill_brewer(palette = "Set1",type="qual")+
+  theme_publ(version=2)
+
+dataPlot=data.frame(capacity=c(mean(sapply(dataRaw$testing$bootstrap,function(x) x$cc)),
+                               mean(sapply(dataSV$testing$bootstrap,function(x) x$cc)),
+                               mean(sapply(dataSV1$testing$bootstrap,function(x) x$cc)),
+                               mean(sapply(dataSV2$testing$bootstrap,function(x) x$cc)),
+                               mean(sapply(dataSV3$testing$bootstrap,function(x) x$cc))),
+                    error=c(sd(sapply(dataRaw$testing$bootstrap,function(x) x$cc)),
+                            sd(sapply(dataSV$testing$bootstrap,function(x) x$cc)),
+                            sd(sapply(dataSV1$testing$bootstrap,function(x) x$cc)),
+                            sd(sapply(dataSV2$testing$bootstrap,function(x) x$cc)),
+                            sd(sapply(dataSV3$testing$bootstrap,function(x) x$cc))),
+                    type=c("standard CC","conditional CC","type 1","type 2","type 3"))
+
+plot3=ggplot(data=dataPlot[1:2,],aes(x=type,y=capacity))+geom_col(colour="black",fill="#377eb8")+
+  geom_errorbar(aes(ymin=capacity-error,ymax=capacity+error))+scale_x_discrete("Algorithm")+
+  theme_publ(version=2)+scale_y_continuous(limits=c(0,1.6))
+
+plot4=ggplot(data=dataPlot[3:5,],aes(x=type,y=capacity))+geom_col(colour="black",fill="#377eb8")+
+  geom_errorbar(aes(ymin=capacity-error,ymax=capacity+error))+scale_x_discrete("Data restricted to")+  theme_publ(version=2)+scale_y_continuous(limits=c(0,1.8))
+```
+
+
+
+
+Mutual information is an excellent tool to quantify cause-effect interactions, as long as the observed heterogeneity is solely the result of random fluctuations and as such consitutes the natural environemnt of the phenomenon in question. Nonetheless, the variability of the measured behaviour could also be a consequence of our inability to discover some other important factors. Then, the data is not representative of the  underlying probability distributions leading to underestimation of the true statistical depdendence and information capacity. Therefore, a proper identification of subpopulations in the data, can lead to a more grounded capacity estimate.
+
+We incorporate these concepts with our inofrmation theoretic framework. Formally, we hypothesize that some of the variability of the response  can be a result of an unobserved covariate that indirectly influence the response. If this is the case, not accounting for this covariate generates artificial heterogeneity and, if information transmission is concerned, underestimate the true capacity of such channel. We thus assume that a channel $\displaystyle X \xrightarrow{P(y|x)} Y$ is additionally dependent on a side variable, $S$, categorical or continuous that can interact with response, $Y$. Practically, in the case of systems biology, $S$ represents the phase of cell cycle, the initial abundance of an important kinase, cell's morphology or microenviornment of the population. In result, the channel is described by a relation $Y\sim P(y|x;s)$. 
+
+Then, from basic probabilistic law $P(y|x)=\int P(y|x,s)P(s)ds.$ In addition, input $X$ is usually applied irrespective of the state, in which cells are, thus we can assume that $X$ and $S$ are independent: $P(x,s)=P(x)P(s).$
+
+In this setting, the notion of mutual information can be extended by the use of conditional mutual information (CMI): 
+$\text{CMI}(X,Y|S)=H(X|S)-H(X|Y,S)$. Based on that we introduce conditional channel capacity ($C^*_{cond}$)
+$$
+C^*_{cond}=\max_{P(X)} \text{ CMI}(X,Y|S) %= \max_{P(X)} \int P(s)\left( H(X|S=s)-H(X|Y,S=s) \right) ds.
+$$
+
+In many applications, CMI has proven to be an excellent measure to analyze interactions [ince2017statistical], couplings of time serie [frenzel2007partial] or network topology [zhang2011inferring,brunel2010miss]. From practical point of view, the assumption of independence between $X$ and $S$, allows to rewrite this formula as
+$$
+C^*_{cond}=\max_{P(X)} \int \sum_{j=1}^m P(y,s|x_j)p(x_j)\log\frac{p(x_j|y,s)}{p(x_j)}dyds,
+$$
+and as such can be directly incorporated into our algorithm. The only change would be to estimate classifier with respect not only to output $Y$, but also all possible interactions between $Y$ and $S$.
+
+The use of capacity $C^*_{cond}$ primarily gives a more realistic estimate of information that can be processed by a channel by explaining a portion of observed heterogeneity of the output. However, it can be also used to confirm, which features (side variables) manifest meaningful subpopulations by a formal statistical test.
+
+To present a quantitative example of the use of $C^*_{cond}$, consider a population, in which cells can be in three states, represented by side variable $S\in\{s_1,s_2,s_3\}$, which occur with probabilities 0.6, 0.3 and 0.1, respectively. Cells are stimulated by four concentration of input, $X\in\{x_1,x_2,x_3,x_4\}$. Let's assume that the response of cell follows normal distribution  given by a formula
+$$ 
+Y|X=x_j,S=s_g \quad \sim \quad \mathcal{N} (j\cdot g, 1^2).
+$$
+It can be interpreted that cells in state $s_1$ are rather insensitive to changes in input, whereas states $s_2, s_3$ corresponds to a responsive behaviour. The resulting distributions are depicted in below Figure.
+
+```{r fig.cap="Graphs of density plots of Y|X distributions", fig.align="center", echo=FALSE, message=FALSE, fig.height=4, fig.width=6,warning=FALSE}
+library(gridExtra)
+plotB1=ggplot(data=data, aes(x=factor(signal),y=response,fill=factor(signal),group=factor(signal) ))+geom_boxplot()
+plotB2=ggplot(data=data, aes(x=factor(signal),y=response,fill=factor(signal),group=factor(signal)))+geom_boxplot()+
+  facet_grid(sideVar~.,scale="free_y")
+grid.arrange(plotB1,plotB2,ncol=2)
+```
+
+We sampled data from the distribution above, so that there are 1000 observations for each signal level by running 
+
+```{r, eval=FALSE, echo=TRUE}
+signal=c("0","0.1","1","10")
+means=list()
+sds=list()
+means[["0"]]=   c(1, 2  ,  3 )
+means[["0.1"]]= c(2, 4  ,  6 )
+means[["1"]]=   c(3, 6  , 9   )
+means[["10"]]=  c(4, 8  , 12   )
+sds[["0"]]   = c(1   , 1 ,1)
+sds[["0.1"]] = c(1 , 1   ,1  )
+sds[["1"]]   = c(1 ,1 ,1)
+sds[["10"]]  = c(1 , 1 ,1  )
+N=c(1000,1000,1000,1000)
+names(N)<-signal
+sideTypes=c("type 1","type 2","type 3")
+probs=c(0.6,0.3,0.1)
+data=do.call(rbind,lapply(signal,function(x){
+  components<-sample(1:3,prob=probs,size=N[x],replace=TRUE)
+  sideVarSample <- sideTypes[components]
+  ResponseSample <- rnorm(n=N[x],mean=means[[x]][components],sd=sds[[x]][components])
+  data.frame(sideVar=sideVarSample,response=ResponseSample,signal=x)
+}))
+colnames(data)<-c("sideVar","response","signal")
+```
+
+Now, in order to calculate conditional channel capacity within our package it is enough to specify `side_variable` and a proper `formula_string` as an argument to `capacity_logreg_main`, e.g.
+
+`capacity_logreg_main(dataRaw=data, signal="signal", response="response", side_variables = "sideVar" , formula_string = "signal~response*sideVar")`
+
+If the knowledge about cellular state is not taken into account, differences of response between subsequent inputs for cellular states $s_2$ and $s_3$ are blurred by observed output of cells in state $s_1$, especially if this is the most prevalent case. Precisely, variances of distributions $Y|X=x_j$ are several times higher. This is visible in low capacity of such system achieving only 0.65 bit. On the other hand, incorporating the variable $S$ into the analysis by calculating $C^*_{cond}$ can correct for this phenomenon and give a significantly higher estimate of capacity of 0.95 bit. Capacities calculated based on observations restricted only to a single subpopulation corraborate the sensitivness of cells in states $s_2$ and $s_3$ since they achieve significantly higher capacities .
+
+```{r fig.cap="Capacities of example using different setups in comparison to conditional channel capacity.", fig.align="center", echo=FALSE, message=FALSE, fig.height=4, fig.width=10,warning=FALSE}
+grid.arrange(plot3,plot4,ncol=2)
+```

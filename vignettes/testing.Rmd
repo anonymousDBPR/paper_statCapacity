@@ -1,0 +1,71 @@
+---
+title: "Testing procedures"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Testing procedures
+
+We implemented four diagnostic procedures to test the correctnes of channel capcaity calculations and to estimate errors due to sample size and overfitting. These include:
+
+1. Bootstrap - where capacity is re-calculated using x% of data sampled from original dataset without replacement. After repeating procedures for n times, basic statistical measures can be obtained as a form of an error estimate.
+2. Division data into Training and Testing datasets - where logistic regression is estimated using x% of data and capacity is calculated via Monte Carlo using remaining (1-x)% of data. After repeating n time, this ascertains the user that there are no problem of the over-fitting in data (sample size is large enough).
+3. Side Variable Shuffling - where side variables' (if given) values are randomly re-shuffled. That is, a new dataset is created where side variable is randomly sampled without replacement from origianl side variable  values 
+4. Side Variable Shuffling with bootstrap - combination of 1 and 3. After repeating n times. this allows for a formal statistical test to determine if the side variable has an significant influence on channel capacity.
+ 
+In order to use those procedures, user must provide additional arguments to function `logreg_capacity_main`, i.e.
+
+* testing (default=FALSE) - logical value that turn on/off testing mode,
+* TestingSeed (default= 1234) - seed for random number generator for replication purposes , 
+* testing_cores (default= 4) - number of cores to use (via doParallel package) in parallel computing of testing samples, 
+* boot_num (default= 40) - number of bootstrap repetitions, 
+* boot_prob (default= 0.8) - fraction of initial observations to use in bootstrap, 
+* traintest_num (default= 40) - number of repetitions of overfitting testing,
+* partition_trainfrac (default= 0.6) - fraction of initial observation to use as training dataset in overfitting testing
+* sidevar_num (default= 40) - number of repetitions of side variable resampling,
+
+For example, user can run
+```c
+dir.create("example1_testing/")
+outputCLR=capacity_logreg_main(dataRaw=data_example1,
+                            signal="signal",response="response",
+                            output_path="example1_testing/",
+                            testing=TRUE, TestingSeed = 1234, testing_cores = 4, 
+                            boot_num = 40, boot_prob = 0.8, 
+                            sidevar_num = 40,
+                            traintest_num = 40,partition_trainfrac = 0.6)
+```
+
+```{r,include=FALSE,cache=TRUE}
+library(CapacityLogReg)
+dir.create("example1_testing/")
+outputCLR_test=capacity_logreg_main(dataRaw=data_example1,
+                            signal="signal",response="response", side_variables = "sideVar",
+                            output_path="example1_testing/",
+                            testing=TRUE, TestingSeed = 1234, testing_cores = 4, 
+                            boot_num = 40, boot_prob = 0.8, 
+                            sidevar_num = 40,
+                            traintest_num = 40,partition_trainfrac = 0.6)
+```
+
+this provide following result
+```{r, include=FALSE}
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r fig.cap="Standard output graph of testing procedures. PV are based on empirical test either left or right sided.",fig.align="center",echo=FALSE,message=FALSE, fig.height=16,fig.width=8}
+grid.arrange(outputCLR_test$logGraphs[[7]])
+```
+
+The top schematic show the value of original capacity estimate (in black) and the mean value of bootstrap repeats with indicated +/- sd (in red). Plots that follow show histograms of calculated capacities for different testing regimes. Black dot represents the basic channel capacity estimate. In addition, empirical p-values (left- and right-sided) are calculated indicating the randomness of obtained results.
+
+As far as interpretation of testing result is concerned:
+
+1. Bootstrap should yield distribution of capacity with small variance and basic capacity should not be an outlier (p-value>0.05). Otherwise, it would indicate that the sample size is too low for accurate estimate of channel capacity.
+2. Division data into Training and Testing datasets - similarly as in 1.
+3. Side Variable Shuffling - the wider is the distance (the smaller is p-value) between basic capacity calculation and re-shuffling regime, the larger is the impact of side variable on capacity calculation.
+4. Side Variable Shuffling with bootstrap - similarly as in 3.
+

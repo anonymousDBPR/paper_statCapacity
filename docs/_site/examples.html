@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Basic examples</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #dddddd; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { font-weight: bold; } /* Keyword */
+code > span.dt { color: #800000; } /* DataType */
+code > span.dv { color: #0000ff; } /* DecVal */
+code > span.bn { color: #0000ff; } /* BaseN */
+code > span.fl { color: #800080; } /* Float */
+code > span.ch { color: #ff00ff; } /* Char */
+code > span.st { color: #dd0000; } /* String */
+code > span.co { color: #808080; font-style: italic; } /* Comment */
+code > span.al { color: #00ff00; font-weight: bold; } /* Alert */
+code > span.fu { color: #000080; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #ff0000; font-weight: bold; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #ff00ff; } /* SpecialChar */
+code > span.vs { color: #dd0000; } /* VerbatimString */
+code > span.ss { color: #dd0000; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { } /* ControlFlow */
+code > span.op { } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { font-weight: bold; } /* Preprocessor */
+code > span.at { } /* Attribute */
+code > span.do { color: #808080; font-style: italic; } /* Documentation */
+code > span.an { color: #808080; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #808080; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #808080; font-weight: bold; font-style: italic; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">LogRegCapacity</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Introduction</a>
+</li>
+<li>
+  <a href="examples.html">Basic Examples</a>
+</li>
+<li>
+  <a href="testing.html">Testing procedures</a>
+</li>
+<li>
+  <a href="conditional.html">Conditional channel capacity</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Extensions
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="formula.html">Formula of logistic regression model</a>
+    </li>
+    <li>
+      <a href="klogistic.html">Kernel logistic regression</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Additional parameters
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="addpar_1.html">Main wrapper function</a>
+    </li>
+    <li>
+      <a href="addpar_2.html">Parameters of nnet package</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Basic examples</h1>
+
+</div>
+
+
+<p>This document shows simple examples of the use of our package to estimate channel capacity for experimental data.</p>
+<div id="basic-experimental-design" class="section level2">
+<h2>Basic experimental design</h2>
+<p>The framework of information theory allows for example to interpret the effectviness of a given system to transmit information between an input (e.g. stimulus, cytokine) and output (e.g. expression of transcription factor) by using channel capacity. This requires that the conditional distribution of output given input is described by sufficiently large dataset. The natural way to organise such data within R is to use data.frame (or data.table for larger datasets) with two types of columns:</p>
+<ol style="list-style-type: decimal">
+<li>signal (input; single column of type factor);</li>
+<li>response (output; possible many columns of type numeric), where each row represents one observation from the experiment.</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="left">signal</th>
+<th align="right">response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">0.6243971</td>
+</tr>
+<tr class="even">
+<td align="left">0</td>
+<td align="right">1.4381236</td>
+</tr>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">0.6560828</td>
+</tr>
+<tr class="even">
+<td align="left">0</td>
+<td align="right">2.0904966</td>
+</tr>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">4.5985088</td>
+</tr>
+<tr class="even">
+<td align="left">0</td>
+<td align="right">0.9114349</td>
+</tr>
+</tbody>
+</table>
+<p>where column signal has finite (and relatively low) number of levels.</p>
+</div>
+<div id="the-structure-of-package" class="section level2">
+<h2>The structure of package</h2>
+<p>The package is based on main wrapper function - <code>capacity_logreg_main</code>, which calls further methods. The use of this function is strongly suggested. The raw algorithm is implemented within <code>capacity_logreg_alogrithm</code> and is based on function <code>multinom</code> from <code>nnet</code> package to estimate logistic regression. Additional function of the package include graphing functions (<code>output_graphs</code>,<code>theme_publ</code>), testing procedures (<code>capacity_logreg_testing</code>,<code>sampling functions</code>) and some auxilliaries (<code>x_log_y</code>,<code>trapz_simple</code>,<code>jointProb_gaussian_md</code>,`<code>formula_generator</code>,<code>deleteNA_df</code>).</p>
+</div>
+<div id="calculating-channel-capacity---example-1" class="section level2">
+<h2>Calculating channel capacity - example #1</h2>
+<p>For the basic example we will use data available in <code>data_example1</code> object that is added to the package. It includes a simple data.frame with three columns:</p>
+<ul>
+<li><code>signal</code> - factor class with 3 levels (500 observations each);</li>
+<li><code>response</code> - numeric class;</li>
+<li><code>sideVar</code> - factor class with 3 levels (various number of observations).</li>
+</ul>
+<p>We can calculate capacity of a channel <span class="math inline">\(X-&gt;Y\)</span>, where <span class="math inline">\(X=signal\)</span>, <span class="math inline">\(Y=response\)</span> using function <code>capacity_logreg_main</code> by supplying:</p>
+<ul>
+<li>the data.frame of experimental data,</li>
+<li>the name of the column to be treated as the signal,</li>
+<li>the name of the column(s) to be treated as the responss</li>
+<li>the directory to which the diagnostic plots are to be plotted</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">library(CapacityLogReg)
+
+dir.create(<span class="st">&quot;example1/&quot;</span>)
+outputCLR=capacity_logreg_main(dataRaw=data_example1,
+                            signal=<span class="st">&quot;signal&quot;</span>,response=<span class="st">&quot;response&quot;</span>,
+                            output_path=<span class="st">&quot;example1/&quot;</span>)</code></pre></div>
+<p>The resulting capacity is saved under <code>outputCLR$cc</code>, whereas the channel beahviour is summarised by several plots combined in <code>MainPlot.pdf</code> under given directory or <code>outputCLR$logGraps[[1]]</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">outputCLR$cc</code></pre></div>
+<pre><code>## [1] 0.4231174</code></pre>
+<div class="figure" style="text-align: center">
+<img src="examples_files/figure-html/unnamed-chunk-5-1.png" alt="Output graphs from capacity_logreg_main applied to data stored in data_example1. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value." width="768" />
+<p class="caption">
+Output graphs from capacity_logreg_main applied to data stored in data_example1. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value.
+</p>
+</div>
+<p>All output is saved in file <code>output.rds</code>.</p>
+</div>
+<div id="calculating-channel-capacity---example-2" class="section level2">
+<h2>Calculating channel capacity - example #2</h2>
+<p>The main advantage of following implementation is its feasibility in applying to multidimensional cases as in data provided in object <code>data_example2</code>, where the response is given by three variables.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">signal</th>
+<th align="right">X1</th>
+<th align="right">X2</th>
+<th align="right">X3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">0.1558092</td>
+<td align="right">0.1804577</td>
+<td align="right">0.0299969</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">-0.1642321</td>
+<td align="right">0.0474489</td>
+<td align="right">-0.4267405</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">0.1389659</td>
+<td align="right">-0.0677927</td>
+<td align="right">-0.0598314</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">-0.1633833</td>
+<td align="right">0.0420471</td>
+<td align="right">0.4013431</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">0.0755505</td>
+<td align="right">0.0976654</td>
+<td align="right">-0.1425694</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">0.1699683</td>
+<td align="right">-0.2149717</td>
+<td align="right">-0.0949465</td>
+</tr>
+</tbody>
+</table>
+<p>We can easily calculate capacity in this case by using</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">library(CapacityLogReg)
+
+dir.create(<span class="st">&quot;example2/&quot;</span>)
+outputCLR=capacity_logreg_main(dataRaw=data_example2,
+                            signal=<span class="st">&quot;signal&quot;</span>,response=c(<span class="st">&quot;X1&quot;</span>,<span class="st">&quot;X2&quot;</span>,<span class="st">&quot;X3&quot;</span>),
+                            output_path=<span class="st">&quot;example2/&quot;</span>)</code></pre></div>
+<p>which returns</p>
+<div class="figure" style="text-align: center">
+<img src="examples_files/figure-html/unnamed-chunk-8-1.png" alt="Output graphs from capacity_logreg_main applied to data stored in data_example2. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value." width="768" />
+<p class="caption">
+Output graphs from capacity_logreg_main applied to data stored in data_example2. Shows: input-output relation, distributions of response columns as violin plots, histograms or density graphs and capacity value.
+</p>
+</div>
+</div>
+
+<p>See package on <a href="https://github.com/TJetka/LogRegCapacity">GitHub</a>. In case of any problems, please contact the authors for further instructions: t.jetka at gmail.com.</p>
+<p>Copyright &copy; 2018 Tomasz Jetka.</p>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

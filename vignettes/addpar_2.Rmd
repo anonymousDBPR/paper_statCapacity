@@ -1,0 +1,16 @@
+---
+title: "Additional parameters: Parameters of nnet package"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Parameters of nnet
+
+The basic usage of our algorithm is based on logistic regression implementation of `nnet` package. We allow to pass to our main wrapper function `capacity_logreg_main` some parameters of original `nnet::nnet` and `nnet::multinom` functions. These are:
+
+* `lr_maxit` (default = 1000) - sets the maximum number of iterations of optimisation step in logistic regression algorithm. Set to higher value if your data is more complex or of high dimension
+* `MaxNWts` (default = 5000) - sets the maximum number of weights defined in logistic regression model. Set to higher value if you data has many dimensions or signal has many states.
+
+Here would be examples showing the importance of these paramteres
